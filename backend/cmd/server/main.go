@@ -9,14 +9,15 @@ import (
 	"time"
 
 	"github.com/rohanshresthaaaa/gridsentinel/backend/internal/grid"
+	"github.com/rohanshresthaaaa/gridsentinel/backend/internal/protection"
 	"github.com/rohanshresthaaaa/gridsentinel/backend/internal/simulator"
 )
 
 func main() {
-	// Stop on Ctrl+C, or automatically after 15 seconds.
+	// Stop on Ctrl+C, or automatically after 30 seconds.
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
-	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
 	readings := make(chan grid.Reading, 16)
@@ -41,12 +42,14 @@ func main() {
 		close(readings)
 	}()
 
-	fmt.Println("GridSentinel simulator running (Ctrl+C to stop)...")
+	monitor := protection.NewMonitor(protection.NewEngine(protection.DefaultElements(120, 50)...))
+
+	fmt.Println("GridSentinel protection running (Ctrl+C to stop)...")
 	for r := range readings {
-		fmt.Printf("%s %s  Va=%6.1f Vb=%6.1f Vc=%6.1f  Ia=%6.1f A  f=%.3f Hz  imbalance=%5.2f%%\n",
-			r.Timestamp.Format("15:04:05"), r.DeviceID,
-			r.PhaseA.VoltageV, r.PhaseB.VoltageV, r.PhaseC.VoltageV,
-			r.PhaseA.CurrentA, r.FrequencyHz, r.VoltageImbalancePercent())
+		for _, tr := range monitor.Process(r) {
+			fmt.Printf("%s %s  %-7s %s\n",
+				tr.Event.Timestamp.Format("15:04:05"), tr.Event.DeviceID, tr.Kind, tr.Event)
+		}
 	}
 	fmt.Println("Simulator stopped.")
 }
