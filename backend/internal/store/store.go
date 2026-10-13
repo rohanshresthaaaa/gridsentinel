@@ -174,3 +174,29 @@ func (s *Store) ActiveAlarms(ctx context.Context) ([]Alarm, error) {
 	}
 	return alarms, rows.Err()
 }
+
+// RecentAlarms returns alarms newest first. An empty deviceID means all devices.
+func (s *Store) RecentAlarms(ctx context.Context, deviceID string, limit int) ([]Alarm, error) {
+	rows, err := s.pool.Query(ctx, `
+		SELECT id, device_id, element, name, phase, value, threshold, unit,
+		       picked_up_at, dropped_out_at
+		FROM protection_events
+		WHERE ($1 = '' OR device_id = $1)
+		ORDER BY picked_up_at DESC
+		LIMIT $2`, deviceID, limit)
+	if err != nil {
+		return nil, fmt.Errorf("query recent alarms: %w", err)
+	}
+	defer rows.Close()
+
+	var alarms []Alarm
+	for rows.Next() {
+		var a Alarm
+		if err := rows.Scan(&a.ID, &a.DeviceID, &a.Element, &a.Name, &a.Phase,
+			&a.Value, &a.Threshold, &a.Unit, &a.PickedUpAt, &a.DroppedOutAt); err != nil {
+			return nil, fmt.Errorf("scan alarm: %w", err)
+		}
+		alarms = append(alarms, a)
+	}
+	return alarms, rows.Err()
+}
