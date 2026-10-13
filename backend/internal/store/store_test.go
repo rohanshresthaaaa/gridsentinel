@@ -108,3 +108,38 @@ func TestCloseStaleAlarms(t *testing.T) {
 		t.Fatalf("want 2 alarms closed, got %d", n)
 	}
 }
+
+func TestRecentAlarmsFiltersAndLimits(t *testing.T) {
+	s := testStore(t)
+	ctx := context.Background()
+	base := time.Now().UTC().Truncate(time.Microsecond)
+
+	// Three RELAY-01 alarms on different phases, one second apart.
+	for i, phase := range []string{"A", "B", "C"} {
+		ev := undervoltageEvent("RELAY-01", base.Add(time.Duration(i)*time.Second))
+		ev.Phase = phase
+		if err := s.RecordPickup(ctx, ev); err != nil {
+			t.Fatal(err)
+		}
+	}
+	// One newer RELAY-02 alarm.
+	if err := s.RecordPickup(ctx, undervoltageEvent("RELAY-02", base.Add(5*time.Second))); err != nil {
+		t.Fatal(err)
+	}
+
+	all, err := s.RecentAlarms(ctx, "", 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(all) != 4 || all[0].DeviceID != "RELAY-02" {
+		t.Fatalf("want 4 alarms with RELAY-02 newest, got %d: %+v", len(all), all)
+	}
+
+	relay1, err := s.RecentAlarms(ctx, "RELAY-01", 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(relay1) != 2 || relay1[0].Phase != "C" {
+		t.Fatalf("want 2 RELAY-01 alarms with phase C newest, got %+v", relay1)
+	}
+}
