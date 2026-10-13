@@ -1,0 +1,170 @@
+.app {
+  min-height: 100vh;
+}
+
+/* ---------- Top bar ---------- */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+.topbar h1 {
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.connection {
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #1e293b;
+}
+
+.connection--live { color: #4ade80; }
+.connection--connecting { color: #facc15; }
+.connection--offline { color: #f87171; }
+
+/* ---------- Layout ---------- */
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.device-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+/* ---------- Relay cards ---------- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 6px solid var(--ok);
+  border-radius: 10px;
+  padding: 16px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.card--alarm {
+  border-left-color: var(--alarm);
+  background: #fff7f7;
+}
+
+.card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.card__header h2 {
+  font-size: 1.1rem;
+}
+
+.card__alarms {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  color: var(--alarm);
+  font-size: 0.85rem;
+}
+
+.metrics {
+  display: flex;
+  gap: 32px;
+  margin: 12px 0 0;
+}
+
+.metrics dt {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.metrics dd {
+  margin: 0;
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Badges ---------- */
+.badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.badge--ok { background: #dcfce7; color: var(--ok); }
+.badge--alarm { background: #fee2e2; color: var(--alarm); }
+.badge--muted { background: #f1f5f9; color: var(--muted); }
+
+/* ---------- Tables ---------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+th {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.flagged,
+.flagged dd {
+  color: var(--alarm);
+  font-weight: 700;
+}
+
+/* ---------- Panels ---------- */
+.panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.panel h2 {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+}
+
+.count {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.empty {
+  color: var(--muted);
+  margin: 0;
+}
